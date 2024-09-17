@@ -1,17 +1,26 @@
+--Sintaxis de la logica proposicional
 data Prop = Var String | Cons Bool | Not Prop
-| And Prop Prop | Or Prop Prop
-| Impl Prop Prop | Syss Prop Prop
-deriving (Eq)
+            | And Prop Prop | Or Prop Prop
+            | Impl Prop Prop | Syss Prop Prop
+            deriving (Eq)
 
 instance Show Prop where 
-    show Cons True = "Verdadero"
-    show Cons False = "Falso"
+    show (Cons True) = "Verdadero"
+    show (Cons False) = "Falso"
     show (Var p) = p
     show (Not p) = "¬" ++ show p
     show (Or p q) = "(" ++ show p ++ " ∨ " ++ show q ++ ")"
     show (And p q) = "(" ++ show p ++ " ∧ " ++ show q ++ ")"
     show (Impl p q) = "(" ++ show p ++ " → " ++ show q ++ ")"
     show (Syss p q) = "(" ++ show p ++ " ↔ " ++ show q ++ ")"
+
+p, q, r, s, t, u :: Prop
+p = Var "p"
+q = Var "q"
+r = Var "r"
+s = Var "s"
+t = Var "t"
+u = Var "u"
     
 negar :: Prop -> Prop
 negar (Var p) = Not (Var p)
@@ -20,6 +29,13 @@ negar (Or p q) = And (negar p) (negar q)
 negar (And p q) = Or (negar p) (negar q)
 negar (Impl p q) = And p (negar q)
 negar (Syss p q) = Not (And (Impl p q) (Impl q p))
+
+distribuir :: Prop -> Prop
+distribuir (Or p (And q r)) = And (distribuir (Or p q)) (distribuir (Or p r))
+distribuir (Or (And q r) p) = And (distribuir (Or q p)) (distribuir (Or r p))
+distribuir (Or p q) = Or (distribuir p) (distribuir q)
+distribuir (And p q) = And (distribuir p) (distribuir q)
+distribuir p = p
 
 -- Ejercicio q.
 fnn :: Prop -> Prop
@@ -33,6 +49,5 @@ fnn (Or p q) = Or (fnn p) (fnn q)
 fnn (Not (And p q)) = Or (fnn (Not p)) (fnn (Not q))  
 fnn (Not (Or p q)) = And (fnn (Not p)) (fnn (Not q)) 
 fnn (Impl p q) = fnn (Or (Not p) q)  
-fnn (Syss p q) = fnn (Or (And p q) (And (Not p) (Not q)))  
-
+fnn (Syss p q) = fnn (Or (And p q) (And (Not p) (Not q))) 
 

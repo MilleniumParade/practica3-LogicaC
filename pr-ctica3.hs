@@ -66,10 +66,20 @@ type Literal = Prop
 type Clausula = [Literal]
 
 -- Ejercicio 5.
--- clausulas :: Prop -> [Clausula]
+--Función Auxiliar.
+extraer :: Prop -> [Literal]
+extraer (Or p q) = extraer p ++ extraer q
+extraer p = [p]
+duplicados [] = []
+duplicados (x:xs) = x : duplicados (filter (/= x) xs)
+
+clausulas :: Prop -> [Clausula]
+clausulas (And p q) = clausulas p ++ clausulas q
+clausulas (Or p q) = [duplicados(extraer (Or p q))]
+clausulas p = [[p]]
 
 --Ejercicio 6
---Función auxiliar
+--Función Auxiliar.
 elimina :: Eq a => a -> [a] ->  [a]
 elimina _ [] = []
 elimina y (x:xs) = if y == x then xs else [x] ++ (elimina y xs)
@@ -98,3 +108,5 @@ hayResolvente :: Clausula -> Clausula -> Bool
 hayResolvente xs ys = if resolucion xs ys == [] 
     then False 
     else True
+
+

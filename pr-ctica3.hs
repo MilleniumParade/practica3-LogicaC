@@ -36,7 +36,7 @@ negar (Syss f1 f2)= negar (And (Impl f1 f2) (Impl f2 f1))
 fnn :: Prop -> Prop
 fnn (Var x) = Var x  
 fnn (Cons b) = Cons b 
-fnn (Not p) = case p of -- Usé esto, no se si esté permitido lol. 
+fnn (Not p) = case p of  
     Not p' -> fnn p' -- Si p == "Not p" entonces aplicamos fnn a p solita (Doble negación).
     And p q -> Or (fnn (Not p)) (fnn (Not q))  -- Si p es un And, entonces hacemos De Morgan para AND
     Or p q -> And (fnn (Not p)) (fnn (Not q))  -- Si p es un Or, entonces hacemos De Morgan para OR
@@ -57,7 +57,7 @@ distribuir p = p
 
 -- Ejercicio 2.
 fnc :: Prop -> Prop
-fnc p = fnn (distribuir p)
+fnc p = distribuir (fnn p)
 
 -- Ejercicio 3.
 type Literal = Prop
@@ -109,4 +109,40 @@ hayResolvente xs ys = if resolucion xs ys == []
     then False 
     else True
 
+--Ejercicio 8.
+-- Función para generar todos los resolventes posibles
+resolventes :: [Clausula] -> [Clausula]
+resolventes cls = [ resolucion c1 c2 | c1 <- cls, c2 <- cls, hayResolvente c1 c2 ]
+
+-- Definimos R(S), que genera el conjunto de resolventes de S
+rS :: [Clausula] -> [Clausula]
+rS cls = eliminarDuplicados (cls ++ resolventes cls)
+
+-- Función auxiliar para comparar si dos conjuntos de cláusulas son iguales
+mismosConjuntos :: Eq a => [a] -> [a] -> Bool
+mismosConjuntos xs ys = null (eliminaDiferentes xs ys) && null (eliminaDiferentes ys xs)
+
+-- Función que elimina los elementos repetidos en dos listas. 
+eliminaDiferentes :: Eq a => [a] -> [a] -> [a]
+eliminaDiferentes [] _ = []
+eliminaDiferentes (x:xs) ys
+  | x `elem` ys = eliminaDiferentes xs ys
+  | otherwise   = x : eliminaDiferentes xs ys
+
+-- Función recursiva para calcular Res_n(S)
+res_n :: [Clausula] -> [Clausula]
+res_n cls =
+  let nuevosResolventes = rS cls
+  in if mismosConjuntos nuevosResolventes cls  -- Si ya no podemos generar nuevos resolventes
+     then cls
+     else res_n nuevosResolventes
+
+-- Función de saturación principal
+saturacion :: Prop -> Bool
+saturacion p =
+  let cls = clausulas (fnc p)  -- Convertimos la fórmula a FNC y obtenemos las cláusulas
+      res = res_n cls          -- Calculamos Res_n(S)
+  in if [] `elem` res           -- Si encontramos la cláusula vacía, es insatisfacible
+     then False
+     else True                  -- Si no encontramos la cláusula vacía, es satisfacible
 

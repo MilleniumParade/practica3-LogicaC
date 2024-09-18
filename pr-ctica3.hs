@@ -68,3 +68,27 @@ type Clausula = [Literal]
 -- Ejercicio 5.
 -- clausulas :: Prop -> [Clausula]
 
+--Ejercicio 6
+--Función auxiliar
+elimina :: Eq a => a -> [a] ->  [a]
+elimina _ [] = []
+elimina y (x:xs) = if y == x then xs else [x] ++ (elimina y xs)
+
+--Función auxiliar
+eliminarDuplicados :: (Eq a) => [a] -> [a]
+eliminarDuplicados [] = []
+eliminarDuplicados (x:xs) = if x `elem` xs then eliminarDuplicados xs else [x] ++ (eliminarDuplicados xs)
+
+--Función auxiliar para resolucion sin eliminar elementos duplicados
+resolucionAux :: Clausula -> Clausula -> Clausula
+resolucionAux [] ys = ys
+resolucionAux ((Var p):xs) ys = if (Not (Var p)) `elem` ys
+    then xs ++ (elimina ((Not (Var p))) ys)
+    else [Var p] ++ resolucionAux xs ys
+resolucionAux ((Not (Var p)):xs) ys = if (Var p) `elem` ys
+    then xs ++ (elimina (Var p) ys)
+    else [Not (Var p)] ++ resolucionAux xs ys
+
+--Función resolución
+resolucion :: Clausula -> Clausula -> Clausula
+resolucion xs ys = eliminarDuplicados (resolucionAux xs ys)

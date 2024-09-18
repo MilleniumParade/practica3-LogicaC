@@ -92,3 +92,9 @@ resolucionAux ((Not (Var p)):xs) ys = if (Var p) `elem` ys
 --Función resolución
 resolucion :: Clausula -> Clausula -> Clausula
 resolucion xs ys = eliminarDuplicados (resolucionAux xs ys)
+
+--Ejercicio 7
+hayResolvente :: Clausula -> Clausula -> Bool
+hayResolvente xs ys = if resolucion xs ys == [] 
+    then False 
+    else True

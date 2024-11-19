@@ -1,8 +1,8 @@
 # Práctica 3: Resolución Binaria
-Alvarez Ríos Metzitlalli 423052523 [MilleniumParadeb](https://github.com/MilleniumParade)  
-Reyes Colín Luis Manuel 321090474 [LuisReyescc](https://github.com/Luisreyescc)  
-León García Gael Arturo 321330927 [GraulerLowe](https://github.com/GraulerLowe)  
-Martìnez Jimènez Maitreyi 320099773 [maitreyi97](https://github.com/maitreyi97)  
+Alvarez Ríos Metzitlalli @[MilleniumParade](https://github.com/MilleniumParade)  
+Reyes Colín Luis Manuel @[LuisReyescc](https://github.com/Luisreyescc)  
+León García Gael Arturo @[GraulerLowe](https://github.com/GraulerLowe)  
+Martìnez Jiménez Maitreyi @[maitreyi97](https://github.com/maitreyi97)  
 
 ## Objetivo
 El objetivo principal de esta práctica, es revisar el concepto de Resolución Binaria, y comprenderlo

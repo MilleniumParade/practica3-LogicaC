@@ -1,4 +1,4 @@
---sintaxis de la logica proposicional
+--Sintaxis de la logica proposicional
 data Prop = Var String | Cons Bool | Not Prop
             | And Prop Prop | Or Prop Prop
             | Impl Prop Prop | Syss Prop Prop
@@ -36,11 +36,7 @@ negar (Syss f1 f2)= negar (And (Impl f1 f2) (Impl f2 f1))
 fnn :: Prop -> Prop
 fnn (Var x) = Var x  
 fnn (Cons b) = Cons b 
-fnn (Not p) = case p of  
-    Not p' -> fnn p' -- Si p == "Not p" entonces aplicamos fnn a p solita (Doble negación).
-    And p q -> Or (fnn (Not p)) (fnn (Not q))  -- Si p es un And, entonces hacemos De Morgan para AND
-    Or p q -> And (fnn (Not p)) (fnn (Not q))  -- Si p es un Or, entonces hacemos De Morgan para OR
-    _      -> Not (fnn p)  -- En cualquier otro caso solo regresamos la negacion de fnn de p :)
+fnn (Not p) = negar (fnn p) 
 fnn (And p q) = And (fnn p) (fnn q)  
 fnn (Or p q) = Or (fnn p) (fnn q)  
 fnn (Impl p q) = fnn (Or (Not p) q)  
@@ -70,15 +66,7 @@ type Clausula = [Literal]
 extraer :: Prop -> [Literal]
 extraer (Or p q) = extraer p ++ extraer q
 extraer p = [p]
-duplicados [] = []
-duplicados (x:xs) = x : duplicados (filter (/= x) xs)
 
-clausulas :: Prop -> [Clausula]
-clausulas (And p q) = clausulas p ++ clausulas q
-clausulas (Or p q) = [duplicados(extraer (Or p q))]
-clausulas p = [[p]]
-
---Ejercicio 6
 --Función Auxiliar.
 elimina :: Eq a => a -> [a] ->  [a]
 elimina _ [] = []
@@ -89,6 +77,12 @@ eliminarDuplicados :: (Eq a) => [a] -> [a]
 eliminarDuplicados [] = []
 eliminarDuplicados (x:xs) = if x `elem` xs then eliminarDuplicados xs else [x] ++ (eliminarDuplicados xs)
 
+clausulas :: Prop -> [Clausula]
+clausulas (And p q) = clausulas p ++ clausulas q
+clausulas (Or p q) = [eliminarDuplicados(extraer (Or p q))]
+clausulas p = clausulas (fnc p)
+
+--Ejercicio 6
 --Función auxiliar para resolucion sin eliminar elementos duplicados
 resolucionAux :: Clausula -> Clausula -> Clausula
 resolucionAux [] ys = ys
@@ -140,9 +134,9 @@ res_n cls =
 -- Función de saturación principal
 saturacion :: Prop -> Bool
 saturacion p =
-  let cls = clausulas (fnc p)  -- Convertimos la fórmula a FNC y obtenemos las cláusulas
+  let cls = clausulas p        -- Obtenemos las cláusulas
       res = res_n cls          -- Calculamos Res_n(S)
-  in if [] `elem` res           -- Si encontramos la cláusula vacía, es insatisfacible
+  in if [] `elem` res          -- Si encontramos la cláusula vacía, es insatisfacible
      then False
      else True                  -- Si no encontramos la cláusula vacía, es satisfacible
 
